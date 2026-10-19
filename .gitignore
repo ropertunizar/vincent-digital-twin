@@ -1,0 +1,29 @@
+# ROS / build
+build/
+devel/
+logs/
+*.pyc
+__pycache__/
+# data (keep out of git; archive separately)
+*.bag
+*.bag.active
+*.ulg
+*.mp4
+*.MP4
+# MATLAB
+*.asv
+*.mex*
+slprj/
+99_export/
+**/03_rosbag/
+# OS / editors
+.DS_Store
+*~
+*.swp
+
+# MATLAB run outputs next to the trajectories
+matlab/trajectories/*/03_rosbag/
+matlab/trajectories/*/99_log/
+matlab/trajectories/*/04_metrics/
+vincent_twin/nanopi/
+vincent_twin/params/

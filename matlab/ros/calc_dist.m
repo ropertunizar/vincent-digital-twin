@@ -1,0 +1,9 @@
+function [dist_to_goal] = calc_dist(goal_pose,local_pose_now)
+%DIST_TO_GOAL Summary of this function goes here
+%   Detailed explanation goes here
+dist_to_goal = sqrt( ...
+    (goal_pose.Pose.Position.X-local_pose_now.Pose.Position.X)^2 + ...
+    (goal_pose.Pose.Position.Y-local_pose_now.Pose.Position.Y)^2 + ...
+    (goal_pose.Pose.Position.Z-local_pose_now.Pose.Position.Z)^2);
+end
+

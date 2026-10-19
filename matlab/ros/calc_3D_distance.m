@@ -1,0 +1,9 @@
+function distance3d = calc_3D_distance (current_pose, goal)
+
+distance3d = sqrt ( ...
+(current_pose.Pose.Position.X - goal.Pose.Position.X)^2 + ...
+(current_pose.Pose.Position.Y - goal.Pose.Position.Y)^2 + ...
+(current_pose.Pose.Position.Z - goal.Pose.Position.Z)^2 );
+
+end
+

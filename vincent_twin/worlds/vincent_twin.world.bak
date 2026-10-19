@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <world name="vincent_twin">
+    <include><uri>model://sun</uri></include>
+    <include><uri>model://ground_plane</uri></include>
+    <!-- Arena: its collision walls are seen by the twin's scan. Keep the scan max range (3 m)
+         shorter than the distance to the arena walls/net, or load a visual-only arena. -->
+    <include><uri>model://UZ_arena_twin</uri></include>
+    <include><uri>model://vincent_twin</uri><pose>0 0 0.2 0 0 0</pose></include>
+
+    <!-- Virtual wall: exists only in the twin. Move it at runtime with /gazebo/set_model_state. -->
+    <model name="virtual_wall">
+      <static>true</static>
+      <pose>2.0 0 1.0 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.05 3.0 2.0</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.05 3.0 2.0</size></box></geometry>
+          <material><ambient>1 0 0 0.6</ambient><diffuse>1 0 0 0.6</diffuse></material>
+          <transparency>0.4</transparency>
+        </visual>
+      </link>
+    </model>
+
+    <physics type="ode"><real_time_factor>1.0</real_time_factor><max_step_size>0.001</max_step_size></physics>
+  </world>
+</sdf>

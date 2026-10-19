@@ -1,0 +1,6 @@
+<launch>
+	<!-- RViz with the real and SITL trajectories (and their setpoints) in the world frame 'map'.
+	     Clear paths: rostopic pub -1 /viz/clear std_msgs/Empty -->
+	<node pkg="vincent_twin" type="path_viz.py" name="path_viz" output="screen" />
+	<node pkg="rviz" type="rviz" name="rviz_twin" args="-d $(find vincent_twin)/rviz/twin.rviz" />
+</launch>

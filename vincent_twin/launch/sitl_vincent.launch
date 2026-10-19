@@ -1,0 +1,56 @@
+<launch>
+	<!-- PX4 SITL Vincent (instance 1) spawned into the RUNNING twin Gazebo (twin_bringup.launch).
+	     Spawn is read from the REAL drone: real OptiTrack (x, y) + (dx, dy), default 1 m behind (-x), facing +x.
+	     The spawn is published as /sim/spawn_offset for the MATLAB hub. x/y are only a fallback (no OptiTrack).
+	     Instance 1 => MAV_SYS_ID 2, onboard UDP 14581 -> 14541, Gazebo TCP 4561 (models/vincent_sim_base).
+	     Always start from a FRESH Gazebo-twin (respawning a PX4 model into a running Gazebo can crash it). -->
+
+	<arg name="ID" default="1" />
+	<arg name="dx" default="-1.0" />
+	<arg name="dy" default="0.0" />
+	<arg name="Y" default="0" />
+	<arg name="x" default="0" />
+	<arg name="y" default="0" />
+	<arg name="scan_to_cp" default="true" />
+
+	<group ns="sim">
+		<env name="PX4_SIM_MODEL" value="gazebo-classic_iris" />
+
+		<node name="sitl" pkg="px4" type="px4" output="screen" required="true"
+			launch-prefix="bash -c 'mkdir -p $HOME/.ros/sitl_vincent_$(arg ID); $0 $@'"
+			args="$(find px4)/build/px4_sitl_default/etc -s etc/init.d-posix/rcS -i $(arg ID) -w $(env HOME)/.ros/sitl_vincent_$(arg ID) -d" />
+
+		<node name="spawn_sim_from_real" pkg="vincent_twin" type="spawn_sim_from_real.py" output="screen">
+			<param name="sdf" value="$(find vincent_twin)/models/vincent_sim/model.sdf" />
+			<param name="model_name" value="vincent_vision" />
+			<param name="dx" value="$(arg dx)" />
+			<param name="dy" value="$(arg dy)" />
+			<param name="Y" value="$(arg Y)" />
+			<param name="x" value="$(arg x)" />
+			<param name="y" value="$(arg y)" />
+		</node>
+
+		<include file="$(find mavros)/launch/node.launch">
+			<arg name="pluginlists_yaml" value="$(find mavros)/launch/px4_pluginlists.yaml" />
+			<arg name="config_yaml" value="$(find mavros)/launch/px4_config.yaml" />
+			<arg name="fcu_url" value="udp://:14541@127.0.0.1:14581" />
+			<arg name="gcs_url" value="" />
+			<arg name="tgt_system" value="2" />
+			<arg name="tgt_component" value="1" />
+			<arg name="log_output" value="screen" />
+			<arg name="fcu_protocol" value="v2.0" />
+			<arg name="respawn_mavros" value="false" />
+		</include>
+		<param name="mavros/local_position/frame_id" value="sim/map" />
+		<param name="mavros/local_position/tf/send" value="false" />
+		<param name="mavros/local_position/tf/frame_id" value="sim/map" />
+		<param name="mavros/local_position/tf/child_frame_id" value="sim/base_link" />
+		<param name="mavros/obstacle/mav_frame" value="BODY_FRD" />
+
+		<node if="$(arg scan_to_cp)" pkg="vincent_twin" type="scan_frd_relay.py" name="scan_frd_relay_sim" output="screen">
+			<param name="flip" value="true" />
+			<remap from="scan_in" to="/vincent_sim/scan" />
+			<remap from="scan_out" to="/sim/mavros/obstacle/send" />
+		</node>
+	</group>
+</launch>

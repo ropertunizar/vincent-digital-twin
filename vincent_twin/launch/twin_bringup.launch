@@ -1,0 +1,53 @@
+<launch>
+	<!-- Laptop: Gazebo twin (arena + vincent_twin + virtual wall), live mirror from OptiTrack,
+	     twin scan -> real drone Collision Prevention. Run after roscore + vincent_optitrack.launch.
+	     export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:$(rospack find vincent_twin)/models:<sitl_gazebo-classic>/models -->
+
+	<arg name="pose_topic" default="/optitrack/pose" />   <!-- fallback: /vincent/mavros/vision_pose/pose (12 Hz, mavros axes) -->
+	<arg name="off_x" default="0.0" />                     <!-- OptiTrack -> Gazebo arena alignment -->
+	<arg name="off_y" default="0.0" />
+	<arg name="off_z" default="-0.136" />
+	<arg name="off_yaw" default="0.0" />
+	<arg name="flip_scan" default="true" />               <!-- ROS CCW -> MAVLink CW; confirm on the bench -->
+	<arg name="gui" default="true" />
+
+	<param name="/use_sim_time" value="false" />
+
+	<include file="$(find gazebo_ros)/launch/empty_world.launch">
+		<arg name="world_name" value="$(find vincent_twin)/worlds/vincent_twin.world" />
+		<arg name="use_sim_time" value="false" />
+		<arg name="gui" value="$(arg gui)" />
+	</include>
+
+	<node pkg="vincent_twin" type="twin_mirror.py" name="twin_mirror" output="screen">
+		<param name="pose_topic" value="$(arg pose_topic)" />
+		<param name="model_name" value="vincent_twin" />
+		<param name="off_x" value="$(arg off_x)" />
+		<param name="off_y" value="$(arg off_y)" />
+		<param name="off_z" value="$(arg off_z)" />
+		<param name="off_yaw" value="$(arg off_yaw)" />
+	</node>
+
+	<node pkg="vincent_twin" type="scan_frd_relay.py" name="scan_frd_relay" output="screen">
+		<param name="flip" value="$(arg flip_scan)" />
+		<remap from="scan_in" to="/vincent_twin/scan" />
+		<remap from="scan_out" to="/vincent/mavros/obstacle/send" />
+	</node>
+
+	<!-- Optional SITL drone (/sim, MAV_SYS_ID 2, offboard UDP 14541<->14581).
+	     Fill in from the paper's SITL launch: px4 instance -i 1 + spawn in this world, then:
+	<group ns="sim">
+		<include file="$(find mavros)/launch/node.launch">
+			<arg name="fcu_url" value="udp://:14541@127.0.0.1:14581" />
+			<arg name="gcs_url" value="" />
+			<arg name="tgt_system" value="2" />
+			<arg name="tgt_component" value="1" />
+			<arg name="pluginlists_yaml" value="$(find mavros)/launch/px4_pluginlists.yaml" />
+			<arg name="config_yaml" value="$(find mavros)/launch/px4_config.yaml" />
+		</include>
+		<param name="mavros/local_position/frame_id" value="sim/map" />
+		<param name="mavros/local_position/tf/frame_id" value="sim/map" />
+		<param name="mavros/local_position/tf/child_frame_id" value="sim/base_link" />
+	</group>
+	-->
+</launch>

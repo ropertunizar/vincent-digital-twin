@@ -1,0 +1,42 @@
+<launch>
+<!-- vim: set ft=xml noet : -->
+<!-- Laptop. Changes vs 2026-10-05: hardcoded /home/jdeese URDF params removed, "$0" typos fixed,
+     stray "s" removed, vision pose remapped into the /vincent namespace. -->
+
+	<arg name="server" default="192.168.0.100"/>
+	<!-- Configurations -->
+	<arg name="X0" default="3.0"/>
+	<arg name="Y0" default="0.0"/>
+	<arg name="Z0" default="0.0"/>
+	<arg name="yaw0" default="0.0"/>
+
+	<node pkg="vrpn_client_ros" type="vrpn_client_node" name="vrpn_client_node" output="screen">
+		<rosparam subst_value="true">
+			server: $(arg server)
+			port: 3883
+			update_frequency: 40.0
+			frame_id: odom
+			# Use the VRPN server's time, or the client's ROS time.
+			use_server_time: false
+			broadcast_tf: true
+			trackers:
+			- vincent
+		</rosparam>
+		<remap from="/vrpn_client_node/vincent/pose" to="/optitrack/pose" />
+	</node>
+
+	<!-- OptiTrack pose -> mavros vision pose (12 Hz), now into /vincent -->
+	<node pkg="optitrack_arena" type="optitrack_pose_tf" name="optitrack_pose_tf" output="screen">
+		<remap from="/mavros/vision_pose/pose" to="/vincent/mavros/vision_pose/pose" />
+	</node>
+
+	<node pkg="tf" type="static_transform_publisher" name="static_broadcaster_map_odom" args="0 0 0 0 0 0 map odom 100" />
+	<node pkg="tf" type="static_transform_publisher" name="static_broadcaster_vincent_baselink" args="0 0 0 0 0 0 vincent base_link 100" />
+
+	<node pkg="hector_trajectory_server" type="hector_trajectory_server" name="trajectory_server_loam" ns="gt">
+		<param name="/target_frame_name" value="odom" />
+		<param name="/source_frame_name" value="vincent" />
+		<param name="/trajectory_update_rate" value="10.0" />
+		<param name="/trajectory_publish_rate" value="10.0" />
+	</node>
+</launch>

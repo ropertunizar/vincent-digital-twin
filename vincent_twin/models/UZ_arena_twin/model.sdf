@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <model name="UZ_arena_twin">
+    <static>true</static>
+    <link name="link">
+      <visual name="visual">
+        <pose>3.5 0 -0.10 0 0 -1.57</pose>
+        <geometry><mesh><uri>file:///home/jdeese/catkin_ws/src/PX4/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/UZ_arena/UZ_Arena_cleaner_lowpoly.dae</uri></mesh></geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>

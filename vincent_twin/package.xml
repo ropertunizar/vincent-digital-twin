@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>vincent_twin</name>
+  <version>0.1.0</version>
+  <description>Live Gazebo twin of Vincent + virtual obstacle for PX4 Collision Prevention</description>
+  <maintainer email="jdendarieta@unizar.es">Juan Dendarieta</maintainer>
+  <license>BSD</license>
+  <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>gazebo_msgs</exec_depend>
+  <exec_depend>gazebo_ros</exec_depend>
+  <exec_depend>gazebo_plugins</exec_depend>
+  <exec_depend>tf</exec_depend>
+  <exec_depend>rosbag</exec_depend>
+</package>

@@ -1,0 +1,21 @@
+    <!--SIMULATING OPTITRACK-->
+    <plugin name="p3d_base_controller" filename="libgazebo_ros_p3d.so">
+      <alwaysOn>true</alwaysOn>
+      <updateRate>50.0</updateRate>
+      <bodyName>base_link</bodyName>
+      <!--frameId>base_link</frameId-->
+      <!--topicName>ground_truth/state</topicName-->
+
+      <topicName>/mavros/odometry/out</topicName>
+      <!--USE NODE VISION TOPIC HANDLER -->
+      <!-- <topicName>/gazebo/ground_truth/pose</topicName>  -->
+
+      <gaussianNoise>0.001</gaussianNoise>
+      <!--frameName>map</frameName-->
+      <!-- JDS:chaning to odom wont work-->
+      <frameName>map</frameName>
+
+      <!-- JDS:doesnt do anything?¿ -->
+      <xyzOffsets>0 0 0</xyzOffsets>
+      <rpyOffsets>0 0 0</rpyOffsets>
+    </plugin>

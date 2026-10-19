@@ -1,0 +1,84 @@
+Panels:
+  - Class: rviz/Displays
+    Name: Displays
+  - Class: rviz/Views
+    Name: Views
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz/Grid
+      Name: Grid
+      Enabled: true
+      Cell Size: 1
+      Plane Cell Count: 12
+      Color: 160; 160; 164
+    - Class: rviz/Axes
+      Name: World
+      Enabled: true
+      Reference Frame: map
+      Length: 0.5
+      Radius: 0.02
+    - Class: rviz/Path
+      Name: Real (OptiTrack)
+      Enabled: true
+      Topic: /viz/path_real
+      Color: 52; 101; 164
+      Line Style: Billboards
+      Line Width: 0.02
+    - Class: rviz/Path
+      Name: Real setpoints
+      Enabled: true
+      Topic: /viz/path_ref_real
+      Color: 114; 159; 207
+      Line Style: Lines
+      Line Width: 0.01
+    - Class: rviz/Path
+      Name: Sim twin (Gazebo)
+      Enabled: true
+      Topic: /viz/path_sim
+      Color: 204; 0; 0
+      Line Style: Billboards
+      Line Width: 0.02
+    - Class: rviz/Path
+      Name: Sim setpoints
+      Enabled: true
+      Topic: /viz/path_ref_sim
+      Color: 239; 41; 41
+      Line Style: Lines
+      Line Width: 0.01
+  Enabled: true
+  Global Options:
+    Fixed Frame: map
+    Background Color: 48; 48; 48
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz/Interact
+      Hide Inactive Objects: true
+    - Class: rviz/MoveCamera
+    - Class: rviz/Select
+    - Class: rviz/FocusCamera
+    - Class: rviz/Measure
+  Value: true
+  Views:
+    Current:
+      Class: rviz/Orbit
+      Name: Current View
+      Target Frame: <Fixed Frame>
+      Distance: 9
+      Focal Point:
+        X: 2
+        Y: 0.5
+        Z: 1.5
+      Pitch: 0.25
+      Yaw: 3.14
+      Near Clip Distance: 0.01
+      Field of View: 0.785398
+    Saved: ~
+Window Geometry:
+  Displays:
+    collapsed: false
+  Views:
+    collapsed: false
+  Height: 800
+  Width: 1200

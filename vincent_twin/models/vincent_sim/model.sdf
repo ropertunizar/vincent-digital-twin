@@ -1,0 +1,18 @@
+<sdf version='1.5'>
+  <model name='vincent_vision'>
+    <plugin name="vision_plugin" filename="libgazebo_vision_plugin.so">
+        <robotNamespace></robotNamespace>
+        <pubRate>30</pubRate>
+        <randomWalk>0.0</randomWalk>
+        <noiseDensity>0.0005</noiseDensity>
+        <corellationTime>60.0</corellationTime>
+    </plugin>
+
+    <include>
+      <uri>model://vincent_sim_base</uri>
+    </include>
+
+  </model>
+</sdf>
+
+<!-- vim: set et ft=xml fenc=utf-8 ff=unix sts=0 sw=2 ts=2 : -->
