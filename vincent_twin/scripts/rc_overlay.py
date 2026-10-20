@@ -6,8 +6,9 @@ Usage:
   python3 rc_overlay.py run.bag out.mp4 --composite obs.mp4 --arm-obs-at 4.0   # burned in, synced on arming (recommended)
   python3 rc_overlay.py run.bag out.mp4 --composite obs.mp4 --offset 2.5   # burned in, manual offset
   python3 rc_overlay.py run.bag --list-arms                                # print the arming times found in the bag
-Options: --ns /vincent --fps 30 --start S --end S --size 480 (gimbal height px) --corner br|bl|tr|tl
---arm-obs-at S: second in the VIDEO where the drone arms (props start spinning); the arming is found in the bag
+Options: --ns /vincent --fps 30 --start S --end S --size 480 (render height px) --corner bc|br|bl|tr|tl --scale 0.38 --margin 0.05
+--arm-obs-at T: time in the VIDEO where the drone arms (props start spinning), in seconds (4.43) or as the Kdenlive
+            timecode HH:MM:SS:FF (00:00:04:13, frames converted with the video's frame rate); the arming is found in the bag
             (<ns>/mavros/state, else the arm switch) and the offset is computed. --arm-n N picks the N-th arming (default 1).
 --offset: seconds to shift the sticks relative to the video (positive = sticks appear later); ignored with --arm-obs-at.
 Needs: pip install rosbags numpy opencv-python-headless imageio-ffmpeg (static ffmpeg, used if the system one is missing/broken).
@@ -26,8 +27,10 @@ ap.add_argument("--pwm-min", type=float, default=982); ap.add_argument("--pwm-ma
 ap.add_argument("--map", default="yaw=1,thr=2,roll=3,pitch=4,arm=5,mode=6,kill=8")
 ap.add_argument("--rev", default="thr", help="comma list of reversed axes")
 ap.add_argument("--composite", default=None, help="video to burn the sticks into (e.g. the OBS recording)")
-ap.add_argument("--offset", type=float, default=0.0); ap.add_argument("--corner", default="br")
-ap.add_argument("--arm-obs-at", "--arm-at", dest="arm_at", type=float, default=None); ap.add_argument("--arm-n", type=int, default=1)
+ap.add_argument("--offset", type=float, default=0.0); ap.add_argument("--corner", default="bc", help="bc (bottom centre, default), br, bl, tr, tl")
+ap.add_argument("--scale", type=float, default=0.38, help="overlay height as a fraction of the video height (composite)")
+ap.add_argument("--margin", type=float, default=0.05, help="distance from the edge as a fraction of the video height")
+ap.add_argument("--arm-obs-at", "--arm-at", dest="arm_at", default=None, help="seconds (4.43) or Kdenlive timecode HH:MM:SS:FF (00:00:04:13)"); ap.add_argument("--arm-n", type=int, default=1)
 ap.add_argument("--list-arms", action="store_true")
 a = ap.parse_args()
 
@@ -79,7 +82,22 @@ if a.list_arms or a.out is None:
     print("arming events (%s), seconds from the start of the stick data:" % src)
     for k, e in enumerate(ev, 1): print("  %d: %.2f s" % (k, e))
     raise SystemExit(0)
+def video_fps(path):
+    import re
+    out = subprocess.run([FF, "-hide_banner", "-i", path], capture_output=True, text=True).stderr
+    m = re.search(r"([0-9.]+) fps", out)
+    return float(m.group(1)) if m else 30.0
+def parse_time(v):
+    if ":" not in v: return float(v)
+    p = [float(x) for x in v.split(":")]
+    fr = p.pop()                              # last field = frames (Kdenlive HH:MM:SS:FF)
+    sec = 0.0
+    for x in p: sec = sec * 60 + x
+    fps = video_fps(a.composite) if a.composite else float(a.fps)
+    print("timecode %s = %.3f s (video %.3g fps)" % (v, sec + fr / fps, fps))
+    return sec + fr / fps
 if a.arm_at is not None:
+    a.arm_at = parse_time(a.arm_at)
     if len(ev) < a.arm_n: raise SystemExit("only %d arming event(s) found in the bag" % len(ev))
     a.offset = a.arm_at - ev[a.arm_n - 1]
     print("arming #%d at %.2f s in the bag (%s) -> video %.2f s -> offset %.2f s" % (a.arm_n, ev[a.arm_n - 1], src, a.arm_at, a.offset))
@@ -123,9 +141,15 @@ p.stdin.close(); p.wait()
 print("overlay: %d frames, %.1f s" % (len(times), len(times) / a.fps))
 
 if a.composite:
-    pos = {"br": "W-w-20:H-h-20", "bl": "20:H-h-20", "tr": "W-w-20:20", "tl": "20:20"}[a.corner]
+    import re
+    info = subprocess.run([FF, "-hide_banner", "-i", a.composite], capture_output=True, text=True).stderr
+    m = re.search(r"Video:.*?(\d{3,5})x(\d{3,5})", info)
+    vh = int(m.group(2)) if m else 1080
+    oh = int(round(vh * a.scale / 2) * 2); mg = int(vh * a.margin)
+    pos = {"bc": f"(W-w)/2:H-h-{mg}", "br": f"W-w-{mg}:H-h-{mg}", "bl": f"{mg}:H-h-{mg}",
+           "tr": f"W-w-{mg}:{mg}", "tl": f"{mg}:{mg}"}[a.corner]
     subprocess.run([FF, "-y", "-loglevel", "error", "-i", a.composite, "-itsoffset", str(a.offset), "-i", tmp_overlay,
-                    "-filter_complex", f"[1:v]scale=-1:ih*0.5[o];[0:v][o]overlay={pos}:eof_action=pass",
+                    "-filter_complex", f"[1:v]scale=-2:{oh}[o];[0:v][o]overlay={pos}:eof_action=pass",
                     "-c:v", "libx264", "-crf", "20", "-preset", "veryfast", "-c:a", "copy", a.out], check=True)
     os.remove(tmp_overlay)
 print("written", a.out)

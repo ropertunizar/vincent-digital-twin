@@ -13,14 +13,14 @@ rosrun vincent_twin record_manual.sh wall      # -> ~/bags/<date>/wall_<time>.ba
 Start OBS (and/or the camera) after the bag. Arm the drone **on camera**: the arming is the sync point.
 
 ## 3. Find the sync point in the video
-Open the OBS recording in any player and note the second where the drone **arms** (the Mirror's propellers start spinning in Gazebo / the motors start on the camera). Example: 4.0 s.
+Open the OBS recording (e.g. in Kdenlive's Clip Monitor) and note the time where the drone **arms** (the Mirror's propellers start spinning in Gazebo / the motors start on the camera). Either seconds (`4.43`) or the Kdenlive timecode as shown (`00:00:04:13`) can be given.
 
 ## 4. Render
 **Burned into the video (one command, synced automatically):**
 ```bash
-python3 ~/catkin_ws/src/vincent_twin/scripts/rc_overlay.py <bag> out.mp4 --composite "<obs video>" --arm-obs-at 4.0
+python3 ~/catkin_ws/src/vincent_twin/scripts/rc_overlay.py <bag> out.mp4 --composite "<obs video>" --arm-obs-at 00:00:04:13
 ```
-The script finds the arming in the bag (PX4 armed state), shifts the sticks so both coincide, and puts the overlay bottom-right at half size (`--corner br|bl|tr|tl`). The ARMED indicator turns red at the same moment the propellers start.
+The script finds the arming in the bag (PX4 armed state), shifts the sticks so both coincide, and places the overlay at the bottom centre, 38 % of the video height (`--corner bc|br|bl|tr|tl`, `--scale 0.38`, `--margin 0.05`). The ARMED indicator turns red at the same moment the propellers start.
 - Several armings in one bag: `--list-arms` prints them, `--arm-n 2` picks the second.
 - Only a part: `--start 10 --end 60` (seconds of stick data).
 
