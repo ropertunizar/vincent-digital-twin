@@ -3,7 +3,8 @@
 	     twin scan -> real drone Collision Prevention. Run after roscore + vincent_optitrack.launch.
 	     export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:$(rospack find vincent_twin)/models:<sitl_gazebo-classic>/models -->
 
-	<arg name="pose_topic" default="/optitrack/pose" />   <!-- fallback: /vincent/mavros/vision_pose/pose (12 Hz, mavros axes) -->
+	<arg name="pose_topic" default="/optitrack/pose" />
+		<param name="state_topic" value="/vincent/mavros/state" />   <!-- fallback: /vincent/mavros/vision_pose/pose (12 Hz, mavros axes) -->
 	<arg name="off_x" default="0.0" />                     <!-- OptiTrack -> Gazebo arena alignment -->
 	<arg name="off_y" default="0.0" />
 	<arg name="off_z" default="-0.136" />

@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <sdf version="1.6">
   <model name="vincent_twin">
-    <!-- Kinematic mirror of the real Vincent: visuals copied from models/vincent (no collision, no PX4 plugins) -->
+    <!-- Kinematic mirror of the real Vincent: visuals copied from models/vincent (no collision, no PX4 plugins).
+         Propellers are separate kinematic links so twin_mirror.py can spin them while the real drone is armed. -->
     <link name="base_link">
       <gravity>false</gravity>
       <kinematic>true</kinematic>
@@ -12,18 +13,6 @@
         <geometry><mesh><scale>0.001 0.001 0.001</scale><uri>model://vincent/meshes/vincent_noprop.stl</uri></mesh></geometry>
         <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/DarkGrey</name></script></material>
       </visual>
-      <visual name="rotor_0"><pose>0.18 -0.175 0.095 0 0 0</pose>
-        <geometry><mesh><uri>model://iris/meshes/iris_prop_ccw.dae</uri></mesh></geometry>
-        <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Blue</name></script></material></visual>
-      <visual name="rotor_1"><pose>-0.18 0.175 0.095 0 0 0</pose>
-        <geometry><mesh><uri>model://iris/meshes/iris_prop_ccw.dae</uri></mesh></geometry>
-        <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Blue</name></script></material></visual>
-      <visual name="rotor_2"><pose>0.18 0.175 0.095 0 0 0</pose>
-        <geometry><mesh><uri>model://iris/meshes/iris_prop_cw.dae</uri></mesh></geometry>
-        <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/DarkGrey</name></script></material></visual>
-      <visual name="rotor_3"><pose>-0.18 -0.175 0.095 0 0 0</pose>
-        <geometry><mesh><uri>model://iris/meshes/iris_prop_cw.dae</uri></mesh></geometry>
-        <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/DarkGrey</name></script></material></visual>
 
       <sensor name="twin_laser" type="ray">
         <update_rate>20</update_rate>
@@ -39,5 +28,23 @@
         </plugin>
       </sensor>
     </link>
+
+    <!-- rotor_0, rotor_1: CCW (blue) | rotor_2, rotor_3: CW (grey) -->
+    <link name="rotor_0"><pose>0.18 -0.175 0.095 0 0 0</pose><gravity>false</gravity><kinematic>true</kinematic>
+      <inertial><mass>0.005</mass><inertia><ixx>1e-6</ixx><iyy>1e-6</iyy><izz>1e-6</izz></inertia></inertial>
+      <visual name="prop"><geometry><mesh><uri>model://iris/meshes/iris_prop_ccw.dae</uri></mesh></geometry>
+        <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Blue</name></script></material></visual></link>
+    <link name="rotor_1"><pose>-0.18 0.175 0.095 0 0 0</pose><gravity>false</gravity><kinematic>true</kinematic>
+      <inertial><mass>0.005</mass><inertia><ixx>1e-6</ixx><iyy>1e-6</iyy><izz>1e-6</izz></inertia></inertial>
+      <visual name="prop"><geometry><mesh><uri>model://iris/meshes/iris_prop_ccw.dae</uri></mesh></geometry>
+        <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Blue</name></script></material></visual></link>
+    <link name="rotor_2"><pose>0.18 0.175 0.095 0 0 0</pose><gravity>false</gravity><kinematic>true</kinematic>
+      <inertial><mass>0.005</mass><inertia><ixx>1e-6</ixx><iyy>1e-6</iyy><izz>1e-6</izz></inertia></inertial>
+      <visual name="prop"><geometry><mesh><uri>model://iris/meshes/iris_prop_cw.dae</uri></mesh></geometry>
+        <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/DarkGrey</name></script></material></visual></link>
+    <link name="rotor_3"><pose>-0.18 -0.175 0.095 0 0 0</pose><gravity>false</gravity><kinematic>true</kinematic>
+      <inertial><mass>0.005</mass><inertia><ixx>1e-6</ixx><iyy>1e-6</iyy><izz>1e-6</izz></inertia></inertial>
+      <visual name="prop"><geometry><mesh><uri>model://iris/meshes/iris_prop_cw.dae</uri></mesh></geometry>
+        <material><script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/DarkGrey</name></script></material></visual></link>
   </model>
 </sdf>
