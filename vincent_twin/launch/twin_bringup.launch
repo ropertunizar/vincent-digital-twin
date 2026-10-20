@@ -51,4 +51,5 @@
 		<param name="mavros/local_position/tf/child_frame_id" value="sim/base_link" />
 	</group>
 	-->
+	<node pkg="vincent_twin" type="rc_stream_request.py" name="rc_stream_request" output="screen" />
 </launch>
